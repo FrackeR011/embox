@@ -173,7 +173,7 @@ static int dwc_setup_txdesc(struct dwc_priv *priv, int idx, uint32_t buff,
 	assert(idx < TX_DESC_QUANTITY);
 
 	desc = &priv->txdesc_ring_paddr[idx];
-
+	log_debug("txdesc_ring_paddr (%p): %d",  &priv->txdesc_ring_paddr[0], idx);
 	desc->basic.des2 = buff;
 	desc->basic.des1 = len & 0x1FFF;
 
@@ -193,6 +193,9 @@ static int dwc_setup_txdesc(struct dwc_priv *priv, int idx, uint32_t buff,
 	data_mem_barrier();
 	desc->basic.des0 |= TDES0_OWN;
 	data_mem_barrier();
+
+	log_debug("txdesc (%p): (0x%x, 0x%x, 0x%x, 0x%x)", desc,
+			desc->basic.des0, desc->basic.des1, desc->basic.des2, desc->basic.des3);
 
 	return idx;
 }
@@ -530,6 +533,7 @@ static int dwc_hw_init(struct dwc_priv *dwc_priv) {
 	reg = dwc_reg_read(dwc_priv, DWC_DMA_BUS_MODE);
 	reg |= (DWC_DMA_BUS_MODE_EIGHTXPBL);
 	reg |= (DWC_DMA_BUS_MODE_PBL_BEATS_8 << DWC_DMA_BUS_MODE_PBL_SHIFT);
+	reg |= (DWC_DMA_BUS_MODE_ENHDESC_USE);
 	dwc_reg_write(dwc_priv, DWC_DMA_BUS_MODE, reg);
 	data_mem_barrier();
 
